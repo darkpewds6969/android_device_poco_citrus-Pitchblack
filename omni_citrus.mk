@@ -21,12 +21,27 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 # Inherit from our custom product configuration
 $(call inherit-product, vendor/pb/config/common.mk)
 
-# Inherit from citrus
-$(call inherit-product, device/poco/citrus/device.mk)
-
 ## Device identifier. This must come after all inclusions
 PRODUCT_DEVICE := citrus
 PRODUCT_NAME := omni_citrus
 PRODUCT_BRAND := POCO
-PRODUCT_MODEL := POCO M3
+PRODUCT_MODEL := M3
 PRODUCT_MANUFACTURER := Xiaomi
+
+PRODUCT_COPY_FILES += $(call find-copy-subdir-files,*,$(LOCAL_PATH)/recovery/root,recovery/root) \
+	$(LOCAL_PATH)/prebuilt/dtb:dtb.img
+	
+# Fastbootd
+PRODUCT_PACKAGES += \
+    android.hardware.fastboot@1.0-impl-mock \
+    android.hardware.fastboot@1.0-impl-mock.recovery \
+    fastbootd
+
+# HACK: Set vendor patch level
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.vendor.build.security_patch=2099-12-31
+
+
+# Dynamic
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+
