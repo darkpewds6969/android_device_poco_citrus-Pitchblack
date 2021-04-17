@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 DEVICE_PATH := device/poco/citrus
 
 # Architecture
@@ -29,6 +28,9 @@ TARGET_2ND_CPU_ABI := armeabi-v7a
 TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := cortex-a73
 
+ENABLE_CPUSETS := true
+ENABLE_SCHEDBOOST := true
+
 # Bootloader
 PRODUCT_PLATFORM := bengal
 TARGET_BOOTLOADER_BOARD_NAME := bengal
@@ -41,25 +43,23 @@ TARGET_BOARD_PLATFORM_GPU := qcom-adreno610
 QCOM_BOARD_PLATFORMS += bengal
 
 # Kernel
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0x4a90000 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=2048 loop.max_part=7
+BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0x4a90000 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=2048
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive androidboot.init_fatal_reboot_target=recovery
-BOARD_KERNEL_BASE := 0x00000000
-BOARD_KERNEL_OFFSET := 0x00008000
-BOARD_KERNEL_SECOND_OFFSET := 0x00f00000
-BOARD_KERNEL_TAGS_OFFSET := 0x00000100
-BOARD_KERNEL_PAGESIZE := 4096
-BOARD_RAMDISK_OFFSET := 0x01000000
-BOARD_DTB_OFFSET := 0x01f00000
-
 BOARD_KERNEL_IMAGE_NAME := Image.gz
-BOARD_INCLUDE_RECOVERY_DTBO := true
-BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+BOARD_KERNEL_PAGESIZE := 4096
 BOARD_BOOT_HEADER_VERSION := 2
-
+BOARD_KERNEL_BASE          := 0x00000000
+BOARD_KERNEL_TAGS_OFFSET   := 0x00000100
+BOARD_KERNEL_OFFSET        := 0x00008000
+BOARD_KERNEL_SECOND_OFFSET := 0x00f00000
+BOARD_RAMDISK_OFFSET       := 0x01000000
+BOARD_DTB_OFFSET           := 0x01f00000
+TARGET_KERNEL_ARCH := arm64
 TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
-
+BOARD_INCLUDE_RECOVERY_DTBO := true
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
@@ -75,11 +75,7 @@ TARGET_OTA_ASSERT_DEVICE := citrus
 
 # AVB
 BOARD_AVB_ENABLE := true
-BOARD_AVB_VBMETA_SYSTEM := system
-BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
-BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 262144
@@ -97,6 +93,7 @@ BOARD_ROOT_EXTRA_FOLDERS := bluetooth dsp firmware persist
 BOARD_SUPPRESS_SECURE_ERASE := true
 
 # File systems
+TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
 # Workaround for error copying vendor files to recovery ramdisk
@@ -105,7 +102,7 @@ TARGET_COPY_OUT_VENDOR := vendor
 
 # Recovery
 BOARD_HAS_LARGE_FILESYSTEM := true
-TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 
 # Crypto
 PLATFORM_SECURITY_PATCH := 2099-12-31
@@ -117,25 +114,24 @@ BOARD_USES_METADATA_PARTITION := true
 
 # TWRP specific build flags
 TW_THEME := portrait_hdpi
+TW_INCLUDE_NTFS_3G := true
 RECOVERY_SDCARD_ON_DATA := true
+TW_EXTRA_LANGUAGES := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TW_EXCLUDE_DEFAULT_USB_INIT := true
-TW_EXTRA_LANGUAGES := true
-TW_INCLUDE_NTFS_3G := true
 TW_USE_TOOLBOX := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_MAX_BRIGHTNESS := 2047
-TW_DEFAULT_BRIGHTNESS := 1200
-TW_Y_OFFSET := 80
-TW_H_OFFSET := -80
+TW_DEFAULT_BRIGHTNESS := 1700
 TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
 TARGET_USES_MKE2FS := true
 TW_EXCLUDE_TWRPAPP := true
 TW_NO_SCREEN_BLANK := true
 PLATFORM_VERSION := 20.1.0
+PB_DISABLE_DEFAULT_TREBLE_COMP := true
+
 TW_INCLUDE_RESETPROP := true
 PB_TORCH_PATH := "/sys/class/leds/led:torch_0"
-
 
