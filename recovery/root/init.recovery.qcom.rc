@@ -28,6 +28,8 @@
 import /init.recovery.resetprop.rc
 
 on fs
+    chown system system /sys/bus/i2c/drivers/aw8624_haptic/1-005a/f0_save
+    chown system system /sys/bus/i2c/drivers/aw8624_haptic/1-005a/osc_save
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     chmod 0660 /dev/qseecom
@@ -40,11 +42,26 @@ on early-fs
     start vold
 
 on init
+	start vibrator-service
+    start hwservicemanager
     setprop crypto.ready 1
 
 service sbinqseecomd /sbin/qseecomd
     user root
     group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service hwservicemanager /sbin/hwservicemanager
+    user root
+    group root
+    disabled
+    onrestart setprop hwservicemanager.ready false
+    seclabel u:r:recovery:s0
+
+service servicemanager /sbin/servicemanager
+    user root
+    group root readproc
     disabled
     seclabel u:r:recovery:s0
 
@@ -62,32 +79,43 @@ service keystore /sbin/keystore /tmp/misc/keystore
     disabled
     seclabel u:r:recovery:s0
 
-service gatekeeper-1-0 /sbin/android.hardware.gatekeeper@1.0-service-qti
+service gatekeeper-1-0-qti /sbin/android.hardware.gatekeeper@1.0-service-qti
     user root
     group root
     disabled
     seclabel u:r:recovery:s0
 
-service keymaster-4-0 /sbin/android.hardware.keymaster@4.0-service-qti
+service keymaster-4-0-qti /sbin/android.hardware.keymaster@4.0-service-qti
     user root
     group root
     disabled
     seclabel u:r:recovery:s0
+	
+service vendor.vibrator-1-0 /sbin/android.hardware.vibrator@1.0-service
+    class hal
+    user system
+    group system input
+    seclabel u:r:recovery:s0
 
+on boot
+    setprop sys.usb.config adb
+    	
 on property:crypto.ready=0
     stop sbinqseecomd
-    stop keymaster-4-0
-    stop gatekeeper-1-0
+    stop keymaster-4-0-qti
+    stop gatekeeper-1-0-qti
     stop servicemanager
 
-on property:crypto.ready=1
+on property:crypto.ready=1 && property:hwservicemanager.ready=true
     start sbinqseecomd
 
 on property:vendor.sys.listeners.registered=true
-    start keymaster-4-0
-    start gatekeeper-1-0
+    start keymaster-4-0-qti
+    start gatekeeper-1-0-qti
+	start servicemanager
 
 on property:sys.usb.config=fastboot
     start servicemanager
     start hwservicemanager
     restart fastbootd
+
