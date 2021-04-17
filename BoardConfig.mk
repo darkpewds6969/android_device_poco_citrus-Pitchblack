@@ -136,3 +136,6 @@ TW_EXCLUDE_TWRPAPP := true
 TW_NO_SCREEN_BLANK := true
 PLATFORM_VERSION := 20.1.0
 TW_INCLUDE_RESETPROP := true
+PB_TORCH_PATH := "/sys/class/leds/led:torch_0"
+
+
